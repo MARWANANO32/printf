@@ -1,24 +1,26 @@
 #include "main.h"
 
 /**
- * _printf - produces output format.
- * @format: format string that printed
+ * _printf - print anything
+ * @format: the format string
  *
- * Return: number of bytes
+ * return: number of bytes printed
  */
+
 int _printf(const char *format, ...)
 {
 	int mul = 0;
-	char *p, *start;
 	va_list ar;
+	char *p, *start;
+
 	params_m params = PARAMS_INIT;
 
 	va_start(ar, format);
 
-	if ((format[0] == '%' && !format[1]) || !format)
+	if (!format || (format[0] == '%' && format[1]))
 		return (-1);
-	if (!format[2] && format[1] == ' ' && format[0] == '%')
-		return (-1);
+	if (format[0] == '%' && format[1] == ' ' && !format[2])
+		return(-1);
 	for (p = (char *)format; *p; p++)
 	{
 		init_params(&params, ar);
@@ -38,10 +40,11 @@ int _printf(const char *format, ...)
 		if (get_modifier(p, &params))
 			p++;
 		if (!get_specifier(p))
-			mul += print_from_to(start, p,
+			mul += print_from_to(strat, p
 					params.l_modifier || params.h_modifier ? p - 1 : 0);
 		else
 			mul += get_print_func(p, ar, &params);
+
 	}
 	_putchar(BUF_FLUSH);
 	va_end(ar);
