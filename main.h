@@ -1,5 +1,6 @@
-#ifndef _PRINTF_H
-#define _PRINTF_H
+<<<<<<< HEAD
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,76 +8,114 @@
 #include <unistd.h>
 #include <stdarg.h>
 
-#define OUTPUT_BUF_SIZE 1024
-#define BUF_FLUSH -1
-#define NULL_STRING "(NULL)"
-#define CONVERT_LOWERCASE 1
-#define CONVERT_UNSIGNED 2
-#define PARAMS_INIT {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define BUFF_SIZE 1024
+#define UNUSED(x) (void)(x)
 
-typedef struct parameters
+/*flags*/
+#define F_MINUS 1
+#define F_PLUS 2
+#define F_ZERO 4
+#define F_HASH 8
+#define F_SPACE 16
+
+/*SIZES*/
+#define S_LONG 2
+#define S_SHORT 1
+
+/**
+ * struct fmt - struct op
+ *
+ * @fmt: the format
+ * @fn: the function associated
+ */
+struct fmt
 {
-	unsigned int unsign       : 1;
-	unsigned int plus_flag    : 1;
-	unsigned int space_flag   : 1;
-	unsigned int hashtag_flag : 1;
-	unsigned int zero_flag    : 1;
-	unsigned int minus_flag   : 1;
-	unsigned int width;
-	unsigned int precision;
-	
-	unsigned int h_modifier : 1;
-	unsigned int l_modifier : 1;
-} params_m;
+	char fmt;
+	int (*fn)(va_list, char[], int, int, int, int);
+};
 
-
-typedef struct specifier
-{
-	char *specifier;
-	int (*f)(va_list, params_m *);
-} specifier_t;
-
-int _puts(char *str);
-int _putchar(int c);
-
-int print_char(va_list ar, params_m *params);
-int print_int(va_list ar, params_m *params);
-int print_string(va_list ar, params_m *params);
-int print_percent(va_list ar, params_m *params);
-int print_S(va_list ar, params_m *params);
-
-char *convert(long int num, int base, int flags, params_m *params);
-int print_unsigned(va_list ar, params_m *params);
-int print_address(va_list ar, params_m *params);
-
-
-int (*get_specifier(char *s))(va_list ar, params_m *params);
-int get_print_func(char *s, va_list ar, params_m *params);
-int get_flag(char *s, params_m *params);
-int get_modifier(char *s, params_m *params);
-char *get_width(char *s, params_m *params, va_list ar);
-
-
-int print_hex(va_list ar, params_m *params);
-int print_HEX(va_list ar, params_m *params);
-int print_binary(va_list ar, params_m *params);
-int print_octal(va_list ar, params_m *params);
-
-int print_from_to(char *start, char *stop, char *except);
-int print_rev(va_list ar, params_m *params);
-int print_rot13(va_list ar, params_m *params);
-
-int _isdigit(int c);
-int _strlen(char *s);
-int print_number(char *str, params_m *params);
-int print_number_right_shift(char *str, params_m *params);
-int print_number_left_shift(char *str, params_m *params);
-
-void init_params(params_m *params, va_list ar);
-
-char *get_precision(char *p, params_m *params, va_list ar);
-
+/**
+ * typedef struct fmt fmt_t - struct op
+ *
+ * @fmt: the format
+ * @fmt_t: the function associated
+ */
+typedef struct fmt fmt_t;
 int _printf(const char *format, ...);
+int handle_print(const char *fmt, int *ind, va_list list, char buffer[],
+                int flags, int width, int precision, int size);
 
 
-#endif
+
+
+/********************FUNCTIONS*****************/
+/* Funtions to print chars and strings */
+int print_char(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_string(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_percent(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+/* Functions to print numbers */
+int print_int(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_binary(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_unsigned(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_octal(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_hexadecimal(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+int print_hexa_upper(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+int print_hexa(va_list types, char map_to[],
+char buffer[], int flags, char flag_ch, int width, int precision, int size);
+
+/* Function to print non printable characters */
+int print_non_printable(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+/* Funcion to print memory address */
+int print_pointer(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+/* Funciotns to handle other specifiers */
+int get_flags(const char *format, int *i);
+int get_width(const char *format, int *i, va_list list);
+int get_precision(const char *format, int *i, va_list list);
+int get_size(const char *format, int *i);
+
+/*Function to print string in reverse*/
+int print_reverse(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+/*Function to print a string in rot 13*/
+int print_rot13string(va_list types, char buffer[],
+	int flags, int width, int precision, int size);
+
+/* width handler */
+int handle_write_char(char c, char buffer[],
+	int flags, int width, int precision, int size);
+int write_number(int is_positive, int ind, char buffer[],
+	int flags, int width, int precision, int size);
+int write_num(int ind, char bff[], int flags, int width, int precision,
+	int length, char padd, char extra_c);
+int write_pointer(char buffer[], int ind, int length,
+	int width, int flags, char padd, char extra_c, int padd_start);
+
+int write_unsgnd(int is_negative, int ind,
+char buffer[],
+	int flags, int width, int precision, int size);
+
+/*****UTILS*******/
+int is_printable(char);
+int append_hexa_code(char, char[], int);
+int is_digit(char);
+
+long int convert_size_number(long int num, int size);
+long int convert_size_unsgnd(unsigned long int num, int size);
+
+#endif /* MAIN_H */
